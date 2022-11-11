@@ -1,0 +1,83 @@
+const Discord = require("discord.js");
+const discordTTS = require('discord-tts');
+const {AudioPlayer, createAudioResource, StreamType, entersState, VoiceConnectionStatus, joinVoiceChannel, createAudioPlayer} = require("@discordjs/voice");
+
+let voiceConnection;
+let audioPlayer=new AudioPlayer();
+
+module.exports = {
+    name: "tts",
+    description: "Sends TTS inside Voice Chat",
+    type: "CHAT_INPUT",
+    toggleOff: false,
+    developersOnly: false,
+    userpermissions: ["VIEW_CHANNEL", "SEND_MESSAGES"],
+    botpermissions: ["VIEW_CHANNEL", "SEND_MESSAGES"],
+    cooldowns: 2000,
+    options: [{
+        name: 'toggle',
+        description: 'type stop in here',
+        type: 'STRING',
+        required: false
+    },
+    {
+        name: 'text',
+        description: 'what Message want say',
+        type: 'STRING',
+        required: true
+    }],
+
+    run: async (client, interaction, args) => {
+
+        if (interaction.options.getString('toggle') == "stop") {
+
+            if (!interaction.member.voice.channel) return
+            var channel =interaction.member.voice;
+                
+            connection1 = joinVoiceChannel({
+                channelId: channel.channelId,
+                guildId: channel.guild.id,
+                adapterCreator: channel.guild.voiceAdapterCreator,
+            });
+                
+            let resource = createAudioResource("", {
+                inlineVolume : true
+            });
+
+            resource.volume.setVolume(0.2);
+                
+            const player = createAudioPlayer();
+            connection1.destroy();
+            player.stop(resource);
+            interaction.delete().catch(O_o => {})
+            return
+            
+        } else {
+
+            const search = interaction.options.getString('text');
+
+            //const stream=discordTTS.getVoiceStream(search);
+            const url = `https://api.streamelements.com/kappa/v2/speech?voice=Ivy&text=${encodeURIComponent(search)}`
+            if (!interaction.member.voice.channel) return
+            var channel = interaction.member.voice;
+                
+            connection1 = joinVoiceChannel({
+                channelId: channel.channelId,
+                guildId: channel.guild.id,
+                adapterCreator: channel.guild.voiceAdapterCreator,
+            });
+                
+            let resource = createAudioResource(url, {
+                inlineVolume : true
+            });
+
+            resource.volume.setVolume(1);
+                
+            const player = createAudioPlayer();
+
+           connection1.subscribe(player)
+           player.play(resource);
+        }
+
+    }
+}

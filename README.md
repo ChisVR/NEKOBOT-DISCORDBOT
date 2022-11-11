@@ -1,2 +1,2 @@
-# NEKOBOT-DISCORDBOT
-My Discord BOT i been Development
+# NEKOBOT
+my NEKO BOT
